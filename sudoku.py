@@ -220,6 +220,5 @@ class StatsManager:
 
 
 if __name__ == "__main__":
-	puzzle, solution = SudokuGenerator.generate("Leicht")
-	for row in puzzle:
-		print(" ".join(str(x) if x else "." for x in row))
+	app = QApplication(sys.argv)
+	sys.exit(app.exec())
