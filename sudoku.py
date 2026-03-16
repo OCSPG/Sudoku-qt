@@ -246,8 +246,6 @@ class SudokuBoard(QWidget):
 		p.setRenderHint(QPainter.Antialiasing)
 		cell, x_off, y_off = self._grid_params()
 		grid_size = cell * 9
-		conflicts = self.game.get_conflicts() if self.game else set()
-
 		# background
 		p.fillRect(self.rect(), QColor("#f0f0f0"))
 		p.fillRect(x_off, y_off, grid_size, grid_size, QColor("white"))
@@ -268,11 +266,13 @@ class SudokuBoard(QWidget):
 						continue
 					x = x_off + c * cell
 					y = y_off + r * cell
-					if (r, c) in conflicts:
-						p.setPen(QColor("red"))
-					elif self.game.given[r][c]:
+					if self.game.given[r][c]:
 						p.setPen(QColor("black"))
+					elif num != self.game.solution[r][c]:
+						# wrong number - red
+						p.setPen(QColor("red"))
 					else:
+						# correct player entry - dark blue
 						p.setPen(QColor("#1a3a6b"))
 					p.drawText(x, y, cell, cell, Qt.AlignCenter, str(num))
 
