@@ -1,8 +1,16 @@
 [project]
 name = "sudoku-qt"
 version = "0.1.0"
-description = "Add your description here"
+description = "Sudoku-Spiel mit PySide6"
 requires-python = ">=3.13"
 dependencies = [
     "pyside6>=6.10.2",
+]
+
+[project.scripts]
+sudoku = "sudoku:main"
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.19.0",
 ]
