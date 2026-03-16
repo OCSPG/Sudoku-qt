@@ -225,8 +225,8 @@ class SudokuBoard(QWidget):
 
 	def __init__(self):
 		super().__init__()
-		self.game = None
-		self.selected = None  # (row, col)
+		self.game: SudokuGame | None = None
+		self.selected: tuple[int, int] | None = None
 		self.paused = False
 		self.setFocusPolicy(Qt.StrongFocus)
 		self.setMinimumSize(400, 400)
