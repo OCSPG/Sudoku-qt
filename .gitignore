@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 stats.json
 .superpowers/
+docs/superpowers/
 build/
 dist/
 *.spec
