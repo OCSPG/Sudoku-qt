@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-stats.json
+**/stats.json
 .superpowers/
 .worktrees/
 docs/superpowers/
