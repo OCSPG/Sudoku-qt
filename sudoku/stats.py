@@ -102,6 +102,7 @@ class StatsDialog(QDialog):
 		table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 		table.setEditTriggers(QTableWidget.NoEditTriggers)
 		table.setSelectionMode(QTableWidget.NoSelection)
+		table.setSortingEnabled(True)
 		for i, entry in enumerate(stats_manager.stats):
 			table.setItem(i, 0, QTableWidgetItem(entry["datum"]))
 			table.setItem(i, 1, QTableWidgetItem(entry["schwierigkeit"]))

@@ -27,7 +27,7 @@ class ActionButton(QPushButton):
 	def _update_style(self):
 		border_color = BLUE.name() if self._active else OVERLAY0.name()
 		text_color = BLUE.name() if self._active else OVERLAY0.name()
-		bg = "transparent" if self._active else SURFACE0.name()
+		bg = SURFACE0.lighter(130).name() if self._active else SURFACE0.name()
 		self.setStyleSheet(f"""
 			QPushButton {{
 				border: 2px solid {border_color};

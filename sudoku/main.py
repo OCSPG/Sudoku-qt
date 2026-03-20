@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
 		QShortcut(QKeySequence("N"), self, self._toggle_notes_shortcut)
 
 	def _toggle_notes_shortcut(self):
-		if not self.game or self.game.paused:
+		if not self.game or self.game.paused or self.selecting_difficulty:
 			return
 		self.notes_mode = not self.notes_mode
 		self.controls.notes_mode = self.notes_mode
@@ -108,6 +108,8 @@ class MainWindow(QMainWindow):
 			self.board.locked = False
 			self.board.update()
 			self.difficulty_bar.set_enabled(False)
+			if self.game:
+				self.difficulty_bar.set_active(self.game.difficulty)
 			self.controls.set_new_game_mode(False)
 			if self.game and not self.game.paused:
 				self.tick_timer.start()
