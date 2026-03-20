@@ -14,6 +14,7 @@ Redesign the single-file Sudoku app to match the two-panel layout of sudoku.com,
 
 ### Difficulty tabs
 - 6 levels: Leicht (36 clues), Mittel (30), Schwer (25), Experte (22), Meister (20), Extrem (17)
+- Meister and Extrem are new - add to SudokuGenerator's clue targets. At 17-20 clues, generation may be slow due to uniqueness checking. If generation takes >5s on average, consider capping retries or relaxing uniqueness slightly, but try the current approach first.
 - Selected tab: Blue (#89b4fa) with underline
 - Inactive tabs: Subtext1 (#bac2de)
 - Disabled during play: Overlay0 (#6c7086), no click response
@@ -37,6 +38,9 @@ Redesign the single-file Sudoku app to match the two-panel layout of sudoku.com,
 ### Undo/Redo
 - Two-stack implementation (same as current).
 - Covers number placement, cell clearing, note changes, and hint placements.
+- Undo stack entries must be extended to support different action types. Each entry is a dict with a `type` key: `"place"` (row, col, old_num, new_num, cleared_notes - dict of notes removed by auto-cleanup), `"note"` (row, col, num, was_added), `"hint"` (row, col, old_num, new_num, cleared_notes). This replaces the current tuple format.
+- A number placement and its associated note auto-cleanup undo as one atomic action. The `cleared_notes` field stores all notes removed so they can be restored on undo.
+- Keyboard shortcuts preserved: Ctrl+Z (undo), Ctrl+Y (redo).
 
 ### Timer
 - Pause button stops timer, overlays grid with semi-transparent Crust (#11111b at ~80%).
@@ -47,13 +51,18 @@ Redesign the single-file Sudoku app to match the two-panel layout of sudoku.com,
 1. Click "Neues Spiel" - board greys out and locks, difficulty tabs become active, button text changes to "Fortsetzen".
 2. Click a difficulty tab - confirmation dialog: "Neues Spiel starten? Aktueller Fortschritt geht verloren."
 3. Confirm - generates new puzzle, tabs grey out, button back to "Neues Spiel".
-4. Cancel or click "Fortsetzen" - board unlocks, tabs grey out, resume current game.
+4. Cancel or click "Fortsetzen" - board unlocks, tabs grey out, resume current game. The selected tab highlight returns to the current game's difficulty.
 
 ### Wrong Number Feedback
 - Wrong player entries shown in red (#f38ba8) immediately, compared against solution.
+- Placing a wrong number still triggers note auto-cleanup in row/col/box (same behavior as correct placement). The player chose to place the number; notes for that number are cleared regardless.
 
 ### Same-Number Highlighting
-- When a cell is selected, all cells containing the same number get a subtle highlight.
+- When a cell is selected, all other cells containing the same number get a subtle highlight. The selected cell itself uses the selected-cell color (#e2ecf7), not the same-number highlight.
+
+### Statistics
+- "Statistik" button placed in the top bar, right-aligned (after the difficulty tabs).
+- StatsDialog styled with Catppuccin colors (see Theme section). Same data as current: total games, best times per difficulty, sortable history table.
 
 ## Theme: Catppuccin Mocha
 
@@ -136,6 +145,10 @@ DifficultyBar -> MainWindow:
 ```
 
 MainWindow is the sole coordinator. Board and ControlPanel never communicate directly. After any state change, MainWindow calls `board.update()` which triggers `paintEvent`. The board reads display state from the SudokuGame object.
+
+**Selection state:** SudokuBoard owns `self.selected` (row, col) internally. It emits `cell_selected` to notify MainWindow so it can route number input to the right cell. The board handles selection highlighting and same-number highlighting in its own `paintEvent`.
+
+**Removed:** `get_conflicts()` is dead code in the current app and is not carried forward. Wrong-number detection is purely solution-comparison.
 
 ## Out of Scope
 - Dark-themed grid interior (grid stays white for readability)
