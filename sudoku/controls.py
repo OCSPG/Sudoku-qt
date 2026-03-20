@@ -197,6 +197,10 @@ class ControlPanel(QWidget):
 			self.hint_btn.set_active(False)
 			self.hint_btn.setEnabled(False)
 			self.hint_badge.hide()
+		else:
+			self.hint_btn.set_active(True)
+			self.hint_btn.setEnabled(True)
+			self.hint_badge.show()
 
 	def set_controls_enabled(self, enabled):
 		for btn in self.num_buttons:

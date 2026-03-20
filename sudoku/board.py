@@ -156,13 +156,16 @@ class SudokuBoard(QWidget):
 		# arrow navigation
 		if self.selected:
 			r, c = self.selected
+			new_sel = self.selected
 			if key == Qt.Key_Up and r > 0:
-				self.selected = (r - 1, c)
+				new_sel = (r - 1, c)
 			elif key == Qt.Key_Down and r < 8:
-				self.selected = (r + 1, c)
+				new_sel = (r + 1, c)
 			elif key == Qt.Key_Left and c > 0:
-				self.selected = (r, c - 1)
+				new_sel = (r, c - 1)
 			elif key == Qt.Key_Right and c < 8:
-				self.selected = (r, c + 1)
-			self.cell_selected.emit(*self.selected)
-			self.update()
+				new_sel = (r, c + 1)
+			if new_sel != self.selected:
+				self.selected = new_sel
+				self.cell_selected.emit(*self.selected)
+				self.update()

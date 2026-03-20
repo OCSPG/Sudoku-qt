@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
 
 	def on_difficulty_selected(self, difficulty):
 		"""User clicked a difficulty tab."""
-		if self.selecting_difficulty and self.game:
+		if self.game:
 			# confirm
 			result = QMessageBox.question(
 				self, "Neues Spiel",
