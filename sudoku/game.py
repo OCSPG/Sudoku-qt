@@ -1,3 +1,6 @@
+from sudoku.solver import SudokuSolver, HintResult
+
+
 class SudokuGame:
 	HINTS_PER_GAME = 3
 
@@ -99,15 +102,35 @@ class SudokuGame:
 		self.redo_stack.clear()
 		return True
 
-	def use_hint(self, row, col):
-		"""Use a hint on the given cell. Returns False if hint can't be used."""
+	def prepare_hint(self, row, col):
+		"""Prepare a hint using technique-based solving. Returns HintResult or None."""
 		if self.hints_remaining <= 0:
-			return False
+			return None
 		if self.given[row][col]:
-			return False
+			return None
 		correct = self.solution[row][col]
 		if self.board[row][col] == correct:
-			return False
+			return None
+
+		# try solver
+		solver = SudokuSolver(self.board, self.difficulty)
+		result = solver.find_hint(target_cell=(row, col))
+		if result:
+			return result
+
+		# fallback: use pre-computed solution
+		return HintResult(
+			cell=(row, col),
+			value=correct,
+			technique="Fallback",
+			explanation=f"Die Lösung zeigt, dass hier eine {correct} hingehört.",
+			highlight_cells=[],
+		)
+
+	def confirm_hint(self, hint_result):
+		"""Confirm and place a prepared hint. Called after 'Verstanden' click."""
+		row, col = hint_result.cell
+		correct = hint_result.value
 		old = self.board[row][col]
 		self.board[row][col] = correct
 		cleared_notes = self._clear_notes_for_placement(row, col, correct)
@@ -118,6 +141,7 @@ class SudokuGame:
 			"old_num": old,
 			"new_num": correct,
 			"cleared_notes": cleared_notes,
+			"technique": hint_result.technique,
 		})
 		self.redo_stack.clear()
 		self.hints_remaining -= 1
