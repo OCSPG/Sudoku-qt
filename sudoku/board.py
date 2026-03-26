@@ -1,11 +1,12 @@
-from PySide6.QtWidgets import QWidget, QSizePolicy
+from PySide6.QtWidgets import QWidget, QSizePolicy, QPushButton
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPainter, QFont, QColor, QPen
+from PySide6.QtGui import QPainter, QFont, QColor, QPen, QFontMetrics
 from sudoku.styles import (
 	GRID_BG, GRID_BOX_BORDER, GRID_CELL_BORDER,
 	GIVEN_NUMBER, PLAYER_CORRECT, PLAYER_WRONG,
 	SELECTED_CELL, SAME_NUMBER_HIGHLIGHT, NOTES_COLOR,
 	PAUSE_OVERLAY, LOCK_OVERLAY, TEXT, BASE,
+	SURFACE0, BLUE, HINT_TARGET, HINT_EVIDENCE, HINT_DIM,
 )
 
 
@@ -13,6 +14,7 @@ class SudokuBoard(QWidget):
 	number_entered = Signal(int)  # 1-9
 	clear_requested = Signal()
 	cell_selected = Signal(int, int)
+	hint_confirmed = Signal()
 
 	def __init__(self):
 		super().__init__()
@@ -20,6 +22,28 @@ class SudokuBoard(QWidget):
 		self.selected = None  # (row, col) or None
 		self.paused = False
 		self.locked = False  # "Neues Spiel" selection mode
+		self.overlay = None  # HintResult or None
+
+		# "Verstanden" button (hidden until overlay active)
+		self.verstanden_btn = QPushButton("Verstanden", self)
+		self.verstanden_btn.setFocusPolicy(Qt.NoFocus)
+		self.verstanden_btn.setVisible(False)
+		self.verstanden_btn.setStyleSheet(f"""
+			QPushButton {{
+				background: {BLUE.name()};
+				color: {BASE.name()};
+				border: none;
+				border-radius: 8px;
+				font-size: 13px;
+				font-weight: bold;
+				padding: 6px 16px;
+			}}
+			QPushButton:hover {{
+				background: {BLUE.lighter(110).name()};
+			}}
+		""")
+		self.verstanden_btn.clicked.connect(self._on_verstanden)
+
 		self.setFocusPolicy(Qt.StrongFocus)
 		self.setMinimumSize(300, 300)
 		self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -124,10 +148,57 @@ class SudokuBoard(QWidget):
 		if self.locked:
 			p.fillRect(x_off, y_off, grid_size, grid_size, LOCK_OVERLAY)
 
+		# hint overlay
+		if self.overlay:
+			involved = set(self.overlay.highlight_cells)
+			involved.add(self.overlay.cell)
+			# dim uninvolved cells
+			for r in range(9):
+				for c in range(9):
+					if (r, c) not in involved:
+						p.fillRect(x_off + c * cell, y_off + r * cell, cell, cell, HINT_DIM)
+			# highlight evidence cells
+			for r, c in self.overlay.highlight_cells:
+				p.fillRect(x_off + c * cell, y_off + r * cell, cell, cell, HINT_EVIDENCE)
+			# highlight target cell
+			tr, tc = self.overlay.cell
+			p.fillRect(x_off + tc * cell, y_off + tr * cell, cell, cell, HINT_TARGET)
+			# draw target value in the target cell
+			p.setPen(QColor("#a6e3a1"))  # Catppuccin Green
+			font = QFont("Sans", max(cell // 3, 10))
+			font.setBold(True)
+			p.setFont(font)
+			p.drawText(
+				x_off + tc * cell, y_off + tr * cell, cell, cell,
+				Qt.AlignCenter, str(self.overlay.value),
+			)
+
+			# explanation text bar below grid
+			bar_y = y_off + grid_size + 8
+			bar_h = 48
+			bar_x = x_off
+			bar_w = grid_size
+			p.setBrush(SURFACE0)
+			p.setPen(Qt.NoPen)
+			p.drawRoundedRect(bar_x, bar_y, bar_w, bar_h, 8, 8)
+			# text
+			p.setPen(TEXT)
+			text_font = QFont("Sans", 10)
+			p.setFont(text_font)
+			text_rect_w = bar_w - 120  # leave room for button
+			p.drawText(
+				bar_x + 12, bar_y, text_rect_w, bar_h,
+				Qt.AlignVCenter | Qt.TextWordWrap, self.overlay.explanation,
+			)
+			# position the Verstanden button
+			self.verstanden_btn.setVisible(True)
+			self.verstanden_btn.move(bar_x + bar_w - 110, bar_y + 8)
+			self.verstanden_btn.setFixedSize(100, 32)
+
 		p.end()
 
 	def mousePressEvent(self, event):
-		if not self.game or self.paused or self.locked:
+		if not self.game or self.paused or self.locked or self.overlay:
 			return
 		cell, x_off, y_off = self._grid_params()
 		c = int((event.position().x() - x_off) // cell)
@@ -138,7 +209,7 @@ class SudokuBoard(QWidget):
 			self.update()
 
 	def keyPressEvent(self, event):
-		if not self.game or self.paused or self.locked:
+		if not self.game or self.paused or self.locked or self.overlay:
 			return
 		key = event.key()
 		# number input
@@ -169,3 +240,10 @@ class SudokuBoard(QWidget):
 				self.selected = new_sel
 				self.cell_selected.emit(*self.selected)
 				self.update()
+
+	def _on_verstanden(self):
+		"""User clicked 'Verstanden' - dismiss overlay."""
+		self.overlay = None
+		self.verstanden_btn.setVisible(False)
+		self.hint_confirmed.emit()
+		self.update()
