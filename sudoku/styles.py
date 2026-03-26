@@ -32,6 +32,11 @@ NOTES_COLOR = QColor("#7f849c")
 PAUSE_OVERLAY = QColor(17, 17, 27, 204)  # Crust at 80%
 LOCK_OVERLAY = QColor(49, 50, 68, 153)  # Surface0 at 60%
 
+# --- Hint overlay colors ---
+HINT_TARGET = QColor(166, 227, 161, 64)    # Catppuccin Green at ~25% opacity
+HINT_EVIDENCE = QColor(243, 139, 168, 51)  # RED at ~20% opacity
+HINT_DIM = QColor(17, 17, 27, 153)         # Crust at 60% opacity
+
 # --- Dimensions ---
 GRID_CONTROLS_GAP = 8
 CONTROL_PANEL_RATIO = 0.35  # right panel width as fraction of available
