@@ -116,36 +116,29 @@ class SudokuSolver:
 	# --- main hint entry point ---
 
 	def find_hint(self, target_cell=None):
-		"""Find a hint. Tries target_cell first, then all cells."""
+		"""Find a hint using the simplest technique possible.
+		Tries target_cell first per technique, then all cells.
+		Returns HintResult or None (caller should use fallback)."""
 		tier = DIFFICULTY_TIER.get(self.difficulty, "basic")
 		allowed = TIER_TECHNIQUES[tier]
 
-		# try target cell first
-		if target_cell:
-			result = self._try_cell(target_cell, allowed)
-			if result:
-				return result
-
-		# scan all empty cells
-		for r in range(9):
-			for c in range(9):
-				if self.board[r][c] == 0 and (r, c) != target_cell:
-					result = self._try_cell((r, c), allowed)
-					if result:
-						return result
-		return None
-
-	def _try_cell(self, cell, allowed):
-		"""Try all allowed techniques on a single cell."""
-		r, c = cell
-		if self.board[r][c] != 0:
-			return None
-
+		# iterate techniques in outer loop to always return simplest explanation
 		for tech in allowed:
 			method = getattr(self, f"_technique_{tech}")
-			result = method(r, c)
-			if result:
-				return result
+			# try target cell first
+			if target_cell:
+				r, c = target_cell
+				if self.board[r][c] == 0:
+					result = method(r, c)
+					if result:
+						return result
+			# scan all other empty cells
+			for r in range(9):
+				for c in range(9):
+					if self.board[r][c] == 0 and (r, c) != target_cell:
+						result = method(r, c)
+						if result:
+							return result
 		return None
 
 	# --- basic techniques ---
