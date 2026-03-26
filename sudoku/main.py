@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
 		self.board.number_entered.connect(self.on_number_entered)
 		self.board.clear_requested.connect(self.on_clear_clicked)
 		self.board.cell_selected.connect(self.on_cell_selected)
+		self.board.hint_confirmed.connect(self.on_hint_confirmed)
 		content_layout.addWidget(self.board, 1)
 
 		# controls (right)
@@ -206,7 +207,21 @@ class MainWindow(QMainWindow):
 		if not self.game or self.game.paused or not self.board.selected:
 			return
 		r, c = self.board.selected
-		self.game.use_hint(r, c)
+		result = self.game.prepare_hint(r, c)
+		if not result:
+			return
+		# if solver found a different cell, move selection there
+		if result.cell != (r, c):
+			self.board.selected = result.cell
+		self.board.overlay = result
+		self.board.update()
+
+	def on_hint_confirmed(self):
+		"""Called when user clicks 'Verstanden' after seeing hint overlay."""
+		if not self.game or not self.board.overlay:
+			return
+		result = self.board.overlay
+		self.game.confirm_hint(result)
 		self.board.update()
 		self.controls.update_hint_badge(self.game.hints_remaining)
 		self.check_completion()
