@@ -116,9 +116,11 @@ class MainWindow(QMainWindow):
 				self.tick_timer.start()
 		else:
 			if self.game:
-				# enter selection mode
+				# enter selection mode - clear any active overlay
 				self.selecting_difficulty = True
 				self.tick_timer.stop()
+				self.board.overlay = None
+				self.board.verstanden_btn.setVisible(False)
 				self.board.locked = True
 				self.board.update()
 				self.difficulty_bar.set_enabled(True)
@@ -149,6 +151,8 @@ class MainWindow(QMainWindow):
 		self.board.selected = None
 		self.board.paused = False
 		self.board.locked = False
+		self.board.overlay = None
+		self.board.verstanden_btn.setVisible(False)
 		self.board.update()
 		self.controls.set_controls_enabled(True)
 		self.controls.update_timer(0)
