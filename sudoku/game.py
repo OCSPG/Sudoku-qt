@@ -112,9 +112,9 @@ class SudokuGame:
 		if self.board[row][col] == correct:
 			return None
 
-		# try solver - only explain the selected cell, don't jump elsewhere
-		solver = SudokuSolver(self.board, self.difficulty)
-		result = solver.find_hint(target_cell=(row, col), only_target=True)
+		# solve step by step until selected cell is explainable
+		solver = SudokuSolver([r[:] for r in self.board], self.difficulty)
+		result = solver.solve_until(row, col)
 		if result:
 			return result
 

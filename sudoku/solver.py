@@ -121,13 +121,27 @@ class SudokuSolver:
 			result = self.find_hint()
 			if not result:
 				return False
-			# place the value and recompute candidates
 			r, c = result.cell
 			self.board[r][c] = result.value
 			self.candidates = self._compute_candidates()
-			# check if solved
 			if all(self.board[r][c] != 0 for r in range(9) for c in range(9)):
 				return True
+
+	def solve_until(self, target_row, target_col):
+		"""Solve step by step until the target cell can be explained.
+		Returns HintResult for the target cell, or None if stuck."""
+		while True:
+			# check if target cell is directly explainable now
+			result = self.find_hint(target_cell=(target_row, target_col), only_target=True)
+			if result:
+				return result
+			# solve one other cell and retry
+			result = self.find_hint()
+			if not result:
+				return None
+			r, c = result.cell
+			self.board[r][c] = result.value
+			self.candidates = self._compute_candidates()
 
 	# --- main hint entry point ---
 
