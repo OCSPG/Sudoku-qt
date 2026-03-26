@@ -115,9 +115,9 @@ class SudokuSolver:
 
 	# --- main hint entry point ---
 
-	def find_hint(self, target_cell=None):
+	def find_hint(self, target_cell=None, only_target=False):
 		"""Find a hint using the simplest technique possible.
-		Tries target_cell first per technique, then all cells.
+		If only_target is True, only try to explain the target cell.
 		Returns HintResult or None (caller should use fallback)."""
 		tier = DIFFICULTY_TIER.get(self.difficulty, "basic")
 		allowed = TIER_TECHNIQUES[tier]
@@ -132,6 +132,8 @@ class SudokuSolver:
 					result = method(r, c)
 					if result:
 						return result
+			if only_target:
+				continue
 			# scan all other empty cells
 			for r in range(9):
 				for c in range(9):

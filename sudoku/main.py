@@ -214,9 +214,6 @@ class MainWindow(QMainWindow):
 		result = self.game.prepare_hint(r, c)
 		if not result:
 			return
-		# if solver found a different cell, move selection there
-		if result.cell != (r, c):
-			self.board.selected = result.cell
 		self.board.overlay = result
 		self.board.update()
 
