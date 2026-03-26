@@ -113,6 +113,22 @@ class SudokuSolver:
 		box_num = (r // 3) * 3 + (c // 3) + 1
 		return f"Block {box_num}"
 
+	def solve_fully(self):
+		"""Repeatedly apply techniques until solved or stuck.
+		Mutates self.board and self.candidates.
+		Returns True if the board is completely solved."""
+		while True:
+			result = self.find_hint()
+			if not result:
+				return False
+			# place the value and recompute candidates
+			r, c = result.cell
+			self.board[r][c] = result.value
+			self.candidates = self._compute_candidates()
+			# check if solved
+			if all(self.board[r][c] != 0 for r in range(9) for c in range(9)):
+				return True
+
 	# --- main hint entry point ---
 
 	def find_hint(self, target_cell=None, only_target=False):
