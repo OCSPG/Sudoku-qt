@@ -1,12 +1,12 @@
 import random
 from PySide6.QtCore import QThread, Signal
+from sudoku.solver import SudokuSolver
 
 
 class SudokuGenerator:
 	@staticmethod
 	def _solve_count(board, limit=2):
 		"""Count solutions up to limit. board is modified in place."""
-		# find first empty cell
 		for r in range(9):
 			for c in range(9):
 				if board[r][c] == 0:
@@ -24,13 +24,10 @@ class SudokuGenerator:
 	@staticmethod
 	def _is_valid(board, row, col, num):
 		"""Check if num can be placed at (row, col)."""
-		# check row
 		if num in board[row]:
 			return False
-		# check column
 		if num in [board[r][col] for r in range(9)]:
 			return False
-		# check 3x3 box
 		box_r, box_c = 3 * (row // 3), 3 * (col // 3)
 		for r in range(box_r, box_r + 3):
 			for c in range(box_c, box_c + 3):
@@ -63,35 +60,27 @@ class SudokuGenerator:
 
 	@staticmethod
 	def generate(difficulty):
-		"""Generate a puzzle. Returns (puzzle, solution) where puzzle has 0s for empty cells."""
-		target_clues = {
-			"Leicht": 36,
-			"Mittel": 30,
-			"Schwer": 25,
-			"Experte": 22,
-			"Meister": 20,
-			"Extrem": 17,
-		}
-		target = target_clues[difficulty]
-
+		"""Generate a puzzle solvable by techniques allowed for the difficulty.
+		Returns (puzzle, solution) where puzzle has 0s for empty cells."""
 		solution = SudokuGenerator._generate_full_board()
 		puzzle = [row[:] for row in solution]
 
 		cells = [(r, c) for r in range(9) for c in range(9)]
 		random.shuffle(cells)
 
-		clues = 81
 		for r, c in cells:
-			if clues <= target:
-				break
 			backup = puzzle[r][c]
 			puzzle[r][c] = 0
-			# check uniqueness
+			# check uniqueness first (fast)
 			test = [row[:] for row in puzzle]
 			if SudokuGenerator._solve_count(test, 2) != 1:
-				puzzle[r][c] = backup  # restore
-			else:
-				clues -= 1
+				puzzle[r][c] = backup
+				continue
+			# check if solvable with allowed techniques
+			test_board = [row[:] for row in puzzle]
+			solver = SudokuSolver(test_board, difficulty)
+			if not solver.solve_fully():
+				puzzle[r][c] = backup  # can't solve without this clue
 
 		return puzzle, solution
 
