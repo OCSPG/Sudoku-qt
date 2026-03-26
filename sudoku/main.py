@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
 		self.controls.new_game_clicked.connect(self.on_new_game_clicked)
 		self.controls.pause_clicked.connect(self.toggle_pause)
 		self.controls.set_controls_enabled(False)
+		self.controls.new_game_btn.setEnabled(False)  # no game to restart yet
 		content_layout.addWidget(self.controls)
 
 		outer_layout.addWidget(content, 1)
@@ -86,6 +87,8 @@ class MainWindow(QMainWindow):
 
 	def on_difficulty_selected(self, difficulty):
 		"""User clicked a difficulty tab."""
+		if self.game and not self.selecting_difficulty:
+			return  # ignore clicks when game is running and not in selection mode
 		if self.game:
 			# confirm
 			result = QMessageBox.question(
@@ -114,20 +117,16 @@ class MainWindow(QMainWindow):
 			self.controls.set_new_game_mode(False)
 			if self.game and not self.game.paused:
 				self.tick_timer.start()
-		else:
-			if self.game:
-				# enter selection mode - clear any active overlay
-				self.selecting_difficulty = True
-				self.tick_timer.stop()
-				self.board.overlay = None
-				self.board.verstanden_btn.setVisible(False)
-				self.board.locked = True
-				self.board.update()
-				self.difficulty_bar.set_enabled(True)
-				self.controls.set_new_game_mode(True)
-			else:
-				# no game running, just enable tabs
-				self.difficulty_bar.set_enabled(True)
+		elif self.game:
+			# enter selection mode - clear any active overlay
+			self.selecting_difficulty = True
+			self.tick_timer.stop()
+			self.board.overlay = None
+			self.board.verstanden_btn.setVisible(False)
+			self.board.locked = True
+			self.board.update()
+			self.difficulty_bar.set_enabled(True)
+			self.controls.set_new_game_mode(True)
 
 	def _start_generation(self, difficulty):
 		self.tick_timer.stop()
@@ -155,8 +154,11 @@ class MainWindow(QMainWindow):
 		self.board.verstanden_btn.setVisible(False)
 		self.board.update()
 		self.controls.set_controls_enabled(True)
+		self.controls.new_game_btn.setEnabled(True)
 		self.controls.update_timer(0)
 		self.controls.update_hint_badge(self.game.hints_remaining)
+		self.difficulty_bar.set_active(difficulty)
+		self.difficulty_bar.set_enabled(False)
 		self.notes_mode = False
 		self.controls.notes_mode = False
 		self.controls.notes_btn.set_active(False)

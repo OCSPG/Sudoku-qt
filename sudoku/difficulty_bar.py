@@ -59,33 +59,38 @@ class DifficultyBar(QWidget):
 			return f"""
 				QPushButton {{
 					color: {OVERLAY0.name()};
-					font-size: 14px;
-					border: none;
-					border-bottom: 2px solid transparent;
-					padding: 4px 0;
+					background: transparent;
+					font-size: 13px;
+					border: 1px solid transparent;
+					border-radius: 6px;
+					padding: 4px 10px;
 				}}
 			"""
 		if active:
 			return f"""
 				QPushButton {{
 					color: {BLUE.name()};
-					font-size: 14px;
+					background: {SURFACE0.name()};
+					font-size: 13px;
 					font-weight: bold;
-					border: none;
-					border-bottom: 2px solid {BLUE.name()};
-					padding: 4px 0;
+					border: 1px solid {BLUE.name()};
+					border-radius: 6px;
+					padding: 4px 10px;
 				}}
 			"""
 		return f"""
 			QPushButton {{
 				color: {SUBTEXT1.name()};
-				font-size: 14px;
-				border: none;
-				border-bottom: 2px solid transparent;
-				padding: 4px 0;
+				background: transparent;
+				font-size: 13px;
+				border: 1px solid {SURFACE0.name()};
+				border-radius: 6px;
+				padding: 4px 10px;
 			}}
 			QPushButton:hover {{
 				color: {TEXT.name()};
+				background: {SURFACE0.name()};
+				border: 1px solid {SUBTEXT0.name()};
 			}}
 		"""
 
