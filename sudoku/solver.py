@@ -191,8 +191,9 @@ class SudokuSolver:
 				# count cells in this unit that can hold val
 				positions = [(r, c) for r, c in unit if val in self.candidates[r][c]]
 				if len(positions) == 1 and positions[0] == (row, col):
-					# evidence: all other cells in the unit
-					evidence = [(r, c) for r, c in unit if (r, c) != (row, col)]
+					# evidence: filled cells in the unit that block other positions
+					evidence = [(r, c) for r, c in unit
+						if (r, c) != (row, col) and self.board[r][c] != 0]
 					explanation = (
 						f"{val} kann in {unit_name} nur in dieses Feld "
 						f"- alle anderen Positionen sind blockiert."

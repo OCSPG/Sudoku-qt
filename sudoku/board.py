@@ -173,10 +173,10 @@ class SudokuBoard(QWidget):
 				Qt.AlignCenter, str(self.overlay.value),
 			)
 
-			# explanation text bar below grid
-			bar_y = y_off + grid_size + 8
-			bar_h = 48
+			# explanation text bar overlaid at bottom of grid
+			bar_h = 52
 			bar_x = x_off
+			bar_y = y_off + grid_size - bar_h
 			bar_w = grid_size
 			p.setBrush(SURFACE0)
 			p.setPen(Qt.NoPen)
@@ -187,12 +187,12 @@ class SudokuBoard(QWidget):
 			p.setFont(text_font)
 			text_rect_w = bar_w - 120  # leave room for button
 			p.drawText(
-				bar_x + 12, bar_y, text_rect_w, bar_h,
+				bar_x + 12, bar_y + 4, text_rect_w, bar_h - 8,
 				Qt.AlignVCenter | Qt.TextWordWrap, self.overlay.explanation,
 			)
 			# position the Verstanden button
 			self.verstanden_btn.setVisible(True)
-			self.verstanden_btn.move(bar_x + bar_w - 110, bar_y + 8)
+			self.verstanden_btn.move(bar_x + bar_w - 110, bar_y + 10)
 			self.verstanden_btn.setFixedSize(100, 32)
 
 		p.end()
