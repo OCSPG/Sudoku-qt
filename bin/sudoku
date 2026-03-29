@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Sudoku Qt - launcher
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+cd "$PROJECT_ROOT"
+
+if [ ! -d ".venv" ]; then
+	echo "First run: setting up environment..."
+	uv sync
+	echo "Setup complete."
+	echo ""
+fi
+
+exec uv run python -m src.main "$@"
