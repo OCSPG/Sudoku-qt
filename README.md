@@ -30,7 +30,8 @@ sudoku
 ## Standalone Binary
 
 ```bash
-uv run pyinstaller --onefile --name sudoku --windowed sudoku.py
+uv add --dev pyinstaller
+uv run pyinstaller --onefile --name sudoku --windowed --collect-submodules sudoku sudoku/main.py
 cp dist/sudoku ~/.local/bin/
 ```
 
