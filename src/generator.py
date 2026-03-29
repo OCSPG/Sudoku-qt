@@ -1,6 +1,6 @@
 import random
 from PySide6.QtCore import QThread, Signal
-from sudoku.solver import SudokuSolver
+from src.solver import SudokuSolver
 
 
 class SudokuGenerator:

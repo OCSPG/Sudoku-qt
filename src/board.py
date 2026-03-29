@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QSizePolicy, QPushButton
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPainter, QFont, QColor, QPen, QFontMetrics
-from sudoku.styles import (
+from src.styles import (
 	GRID_BG, GRID_BOX_BORDER, GRID_CELL_BORDER,
 	GIVEN_NUMBER, PLAYER_CORRECT, PLAYER_WRONG,
 	SELECTED_CELL, SAME_NUMBER_HIGHLIGHT, NOTES_COLOR,

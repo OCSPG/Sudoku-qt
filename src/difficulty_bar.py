@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
-from sudoku.styles import MANTLE, SURFACE0, BLUE, SUBTEXT0, SUBTEXT1, OVERLAY0, TEXT, DIFFICULTIES
+from src.styles import MANTLE, SURFACE0, BLUE, SUBTEXT0, SUBTEXT1, OVERLAY0, TEXT, DIFFICULTIES
 
 
 class DifficultyBar(QWidget):

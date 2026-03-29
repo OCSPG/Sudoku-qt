@@ -2,13 +2,13 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QMessageBox
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QKeySequence, QShortcut
-from sudoku.board import SudokuBoard
-from sudoku.controls import ControlPanel
-from sudoku.difficulty_bar import DifficultyBar
-from sudoku.game import SudokuGame
-from sudoku.generator import GeneratorThread
-from sudoku.stats import StatsManager, StatsDialog
-from sudoku.styles import BASE, GRID_CONTROLS_GAP
+from src.board import SudokuBoard
+from src.controls import ControlPanel
+from src.difficulty_bar import DifficultyBar
+from src.game import SudokuGame
+from src.generator import GeneratorThread
+from src.stats import StatsManager, StatsDialog
+from src.styles import BASE, GRID_CONTROLS_GAP
 
 
 class MainWindow(QMainWindow):

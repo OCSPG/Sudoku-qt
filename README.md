@@ -31,7 +31,7 @@ sudoku
 
 ```bash
 uv add --dev pyinstaller
-uv run pyinstaller --onefile --name sudoku --windowed --collect-submodules sudoku sudoku/main.py
+uv run pyinstaller --onefile --name sudoku --windowed --collect-submodules src src/main.py
 cp dist/sudoku ~/.local/bin/
 ```
 

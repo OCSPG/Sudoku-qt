@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
-from sudoku.styles import (
+from src.styles import (
 	BASE, SURFACE0, BLUE, TEXT, SUBTEXT0, OVERLAY0,
 	ACTION_BUTTON_SIZE, NUMPAD_GAP,
 )

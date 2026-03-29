@@ -1,4 +1,4 @@
-from sudoku.solver import SudokuSolver, HintResult
+from src.solver import SudokuSolver, HintResult
 
 
 class SudokuGame:

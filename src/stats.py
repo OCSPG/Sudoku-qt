@@ -7,14 +7,14 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-from sudoku.styles import (
+from src.styles import (
 	MANTLE, SURFACE0, TEXT, SUBTEXT0, BLUE, BASE, DIFFICULTIES,
 )
 
 
 class StatsManager:
 	def __init__(self):
-		self.stats_path = Path(__file__).parent / "stats.json"
+		self.stats_path = Path.home() / ".local" / "share" / "sudoku-qt" / "stats.json"
 		self.stats = self._load()
 
 	def _load(self):
@@ -31,6 +31,7 @@ class StatsManager:
 		}
 		self.stats.insert(0, entry)
 		try:
+			self.stats_path.parent.mkdir(parents=True, exist_ok=True)
 			self.stats_path.write_text(json.dumps(self.stats, indent=2))
 		except OSError:
 			pass
