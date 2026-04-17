@@ -137,14 +137,29 @@ class MainWindow(QMainWindow):
 		self.difficulty_bar.set_enabled(False)
 
 		if self.generator_thread and self.generator_thread.isRunning():
+			# stop the old thread before replacing it
 			self.generator_thread.finished.disconnect()
+			self.generator_thread.error.disconnect()
+			self.generator_thread.quit()
+			self.generator_thread.wait(3000)
 		self.generator_thread = GeneratorThread(difficulty)
 		self.generator_thread.finished.connect(
 			lambda p, s: self.on_puzzle_ready(p, s, difficulty)
 		)
+		self.generator_thread.error.connect(self._on_generator_error)
 		self.generator_thread.start()
 
+	def _on_generator_error(self, msg):
+		"""Shows error dialog; on_puzzle_ready(None, None) re-enables controls."""
+		QMessageBox.critical(self, "Generation failed", f"Could not generate puzzle:\n{msg}")
+
 	def on_puzzle_ready(self, puzzle, solution, difficulty):
+		if puzzle is None:
+			# generation failed — unblock UI without starting a game
+			self.controls.set_controls_enabled(False)
+			self.controls.new_game_btn.setEnabled(self.game is not None)
+			self.difficulty_bar.set_enabled(True)
+			return
 		self.game = SudokuGame(puzzle, solution, difficulty)
 		self.board.game = self.game
 		self.board.selected = None

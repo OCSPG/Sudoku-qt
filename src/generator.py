@@ -1,4 +1,5 @@
 import random
+import logging
 from PySide6.QtCore import QThread, Signal
 from src.solver import SudokuSolver
 
@@ -86,12 +87,19 @@ class SudokuGenerator:
 
 
 class GeneratorThread(QThread):
-	finished = Signal(list, list)  # puzzle, solution
+	# puzzle/solution on success; both None on failure
+	finished = Signal(object, object)
+	error = Signal(str)
 
 	def __init__(self, difficulty):
 		super().__init__()
 		self.difficulty = difficulty
 
 	def run(self):
-		puzzle, solution = SudokuGenerator.generate(self.difficulty)
-		self.finished.emit(puzzle, solution)
+		try:
+			puzzle, solution = SudokuGenerator.generate(self.difficulty)
+			self.finished.emit(puzzle, solution)
+		except Exception as e:
+			logging.exception("GeneratorThread: generation failed")
+			self.error.emit(str(e))
+			self.finished.emit(None, None)
